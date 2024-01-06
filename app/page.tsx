@@ -9,27 +9,13 @@ export default function Home() {
   const chargePerMinute = 0.1429
   const defaultInitCharge = 20
   const getCurrentDateTime = () => {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = (now.getMonth() + 1).toString().padStart(2, '0');
-    const day = now.getDate().toString().padStart(2, '0');
-    const hours = now.getHours().toString().padStart(2, '0');
-    const minutes = now.getMinutes().toString().padStart(2, '0');
-
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
+    return new Date();
   };
 
   const getDefaultEndDate = () => {
     const now = new Date();
     now.setDate(now.getDate() + 1);
-
-    const year = now.getFullYear();
-    const month = (now.getMonth() + 1).toString().padStart(2, '0');
-    const day = now.getDate().toString().padStart(2, '0');
-    const hours = now.getHours().toString().padStart(2, '0');
-    const minutes = now.getMinutes().toString().padStart(2, '0');
-
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
+    return now;
   };
 
   const getEndDate = (initDate: Date, chargeInitial: number, percentToCharge: number | null) => {
@@ -43,15 +29,8 @@ export default function Home() {
     const newDateEpochSeconds = initDateEpochSeconds + Math.floor(minutesPourCharger * 60);
 
     // Création d'une nouvelle date à partir des epoch seconds obtenus
-    const newDate = new Date(newDateEpochSeconds * 1000); // Multipliez par 1000 pour convertir les secondes en millisecondes
-
-    const year = newDate.getFullYear();
-    const month = (newDate.getMonth() + 1).toString().padStart(2, '0');
-    const day = newDate.getDate().toString().padStart(2, '0');
-    const hours = newDate.getHours().toString().padStart(2, '0');
-    const minutes = newDate.getMinutes().toString().padStart(2, '0');
-
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
+     // Multipliez par 1000 pour convertir les secondes en millisecondes
+    return new Date(newDateEpochSeconds * 1000);
   };
 
   const getStartDate = (endDate: Date, chargeInitial: number, percentToCharge: number | null) => {
@@ -67,17 +46,20 @@ export default function Home() {
     // Création d'une nouvelle date à partir des epoch seconds obtenus
     const newDate = new Date(newStartDateEpochSeconds * 1000); // Multipliez par 1000 pour convertir les secondes en millisecondes
 
-    const year = newDate.getFullYear();
-    const month = (newDate.getMonth() + 1).toString().padStart(2, '0');
-    const day = newDate.getDate().toString().padStart(2, '0');
-    const hours = newDate.getHours().toString().padStart(2, '0');
-    const minutes = newDate.getMinutes().toString().padStart(2, '0');
-
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
+    return newDate;
   };
+
+  const formatDate = (date: Date) => {
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+
+    return `${hours}:${minutes}`;
+  }
 
   const [startDate, setStartDate] = useState(getCurrentDateTime());
   const [endDate, setEndDate] = useState(getDefaultEndDate());
+  const [startDateString, setStartDateString] = useState(formatDate(getCurrentDateTime()))
+  const [endDateString, setEndDateString] = useState(formatDate(getDefaultEndDate()))
   const [chargePercentage, setChargePercentage] = useState(chargeMax - defaultInitCharge);
   const [startPercentage, setStartPercentage] = useState(defaultInitCharge);
 
@@ -85,12 +67,13 @@ export default function Home() {
     const { name, value } = e.target;
     switch (name) {
       case 'startDate':
-        setStartDate(value);
+
+        setStartDate(new Date(value));
         let newInitDate = new Date(value)
           setEndDate(getEndDate(newInitDate, startPercentage, chargePercentage))
         break;
       case 'endDate':
-        setEndDate(value);
+        setEndDate(new Date(value));
         let newEndDate = new Date(value)
           setStartDate(getStartDate(newEndDate, startPercentage, null))
         break;
@@ -149,9 +132,9 @@ export default function Home() {
               <div className="flex flex-col items-start mb-4">
                 <label className="mb-2">Date de début:</label>
                 <input
-                    type="datetime-local" // Utilisez le type datetime-local ici
+                    type="time"
                     name="startDate"
-                    value={startDate}
+                    value={startDate.toString()}
                     onChange={handleInputChange}
                     className="border p-2 rounded w-full"
                 />
@@ -160,9 +143,9 @@ export default function Home() {
               <div className="flex flex-col items-start mb-4">
                 <label className="mb-2">Date de fin:</label>
                 <input
-                    type="datetime-local" // Utilisez le type datetime-local ici
+                    type="time"
                     name="endDate"
-                    value={endDate}
+                    value={endDate.toString()}
                     onChange={handleInputChange}
                     className="border p-2 rounded w-full"
                 />
